@@ -20,6 +20,10 @@ jobs:
 
       - name: Install SwiftLint
         run: brew install swiftlint
+        
+      - name: Verify SwiftLint installation
+        run: swiftlint version
 
       - name: Run SwiftLint
         run: swiftlint
+        
