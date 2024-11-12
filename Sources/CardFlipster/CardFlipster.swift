@@ -1,5 +1,5 @@
 public struct Flashcard {
-    
+
     public let text: String
     public let answer: String!
 
