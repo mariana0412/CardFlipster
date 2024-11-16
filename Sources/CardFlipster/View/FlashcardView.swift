@@ -9,6 +9,8 @@ import SwiftUI
 
 public struct FlashcardView: View {
 
+    // MARK: - Constants
+
     private enum Constants {
         static let cardWidth: CGFloat = 300
         static let cardHeight: CGFloat = 450
@@ -19,12 +21,36 @@ public struct FlashcardView: View {
         static let swipeAnimationDuration = 0.4
     }
 
+    // MARK: - Axis3D Struct
+
+    // MARK: - Axis3D Enum
+
+    private enum Axis3D {
+        case horizontal
+        case vertical
+
+        var values: (x: CGFloat, y: CGFloat, z: CGFloat) {
+            switch self {
+            case .horizontal:
+                return (0, 1, 0)
+            case .vertical:
+                return (1, 0, 0)
+            }
+        }
+    }
+
+    // MARK: - State
+
     @State private var dragOffset: CGSize = .zero
     @State private var cardOpacity: Double = 1.0
     @Binding var isFlipped: Bool
 
+    // MARK: - Callbacks
+
     let onSwipeRight: () -> Void
     let onSwipeLeft: () -> Void
+
+    // MARK: - Properties
 
     let frontText: String
     let backText: String
@@ -36,57 +62,86 @@ public struct FlashcardView: View {
     let axis: Axis
     let animationDuration: TimeInterval
 
+    // MARK: - Body
+
     public var body: some View {
         VStack {
             cardView
         }
     }
 
+    // MARK: - Card View
+
     private var cardView: some View {
-        flashcard
-            .id(isFlipped)
-            .offset(x: dragOffset.width)
-            .gesture(
-                DragGesture()
-                    .onChanged { value in
-                        if isFlipped {
-                            dragOffset = value.translation
-                        }
-                    }
-                    .onEnded { value in
-                        handleSwipe(value: value)
-                    }
-            )
-            .transition(.flip(side: isFlipped ? .back : .front,
-                              axis: axis,
-                              animationDuration: animationDuration))
-            .onTapGesture {
-                withAnimation(.easeInOut(duration: animationDuration)) {
-                    isFlipped.toggle()
-                }
-            }
+        ZStack {
+            cardSide(text: frontText, color: frontColor, fontColor: frontFontColor)
+                .opacity(isFlipped ? 0 : 1)
+                .rotation3DEffect(
+                    .degrees(isFlipped ? 180 : 0),
+                    axis: resolvedAxis
+                )
+
+            cardSide(text: backText, color: backColor, fontColor: backFontColor)
+                .opacity(isFlipped ? 1 : 0)
+                .rotation3DEffect(
+                    .degrees(isFlipped ? 0 : -180),
+                    axis: resolvedAxis
+                )
+        }
+        .offset(x: dragOffset.width)
+        .gesture(dragGesture)
+        .onTapGesture(perform: handleTap)
     }
 
-    private var flashcard: some View {
+    private func cardSide(text: String, color: Color, fontColor: Color) -> some View {
         RoundedRectangle(cornerRadius: Constants.cornerRadius)
-            .fill(isFlipped ? backColor : frontColor)
-            .overlay(contentOverlay)
+            .fill(color)
+            .overlay(
+                Text(text)
+                    .font(font)
+                    .foregroundColor(fontColor)
+                    .padding()
+                    .minimumScaleFactor(Constants.minScaleFactor)
+            )
             .frame(width: Constants.cardWidth, height: Constants.cardHeight)
     }
 
-    private var contentOverlay: some View {
-        Text(isFlipped ? backText : frontText)
-            .font(font)
-            .foregroundColor(isFlipped ? backFontColor : frontFontColor)
-            .padding()
-            .minimumScaleFactor(Constants.minScaleFactor)
+    // MARK: - Drag Gesture
+
+    private var dragGesture: some Gesture {
+        DragGesture()
+            .onChanged { value in
+                if isFlipped {
+                    dragOffset = value.translation
+                }
+            }
+            .onEnded { value in
+                handleSwipe(value: value)
+            }
+    }
+
+    // MARK: - Helpers
+
+    // swiftlint:disable large_tuple
+    private var resolvedAxis: (CGFloat, CGFloat, CGFloat) {
+        switch axis {
+        case .horizontal:
+            return (0, 1, 0)
+        case .vertical:
+            return (1, 0, 0)
+        }
+    }
+    // swiftlint:enable large_tuple
+    
+    private func handleTap() {
+        withAnimation(.easeInOut(duration: animationDuration)) {
+            isFlipped.toggle()
+        }
     }
 
     private func handleSwipe(value: DragGesture.Value) {
         guard isFlipped else {
-            withAnimation {
-                dragOffset = .zero
-            }
+            resetCardPosition()
             return
         }
 
@@ -94,27 +149,39 @@ public struct FlashcardView: View {
         let isSwipeLeft = value.translation.width < -Constants.swipeThreshold
 
         if isSwipeRight || isSwipeLeft {
-            withAnimation(.easeInOut(duration: Constants.swipeAnimationDuration)) {
-                dragOffset.width = isSwipeRight ? Constants.swipeOffscreenDistance : -Constants.swipeOffscreenDistance
-                cardOpacity = 0.0
-            }
-
-            DispatchQueue.main.asyncAfter(deadline: .now() + Constants.swipeAnimationDuration) {
-                if isSwipeRight {
-                    onSwipeRight()
-                } else if isSwipeLeft {
-                    onSwipeLeft()
-                }
-
-                dragOffset = .zero
-                cardOpacity = 1.0
-            }
+            performSwipeAnimation(isSwipeRight: isSwipeRight)
         } else {
-            withAnimation {
-                dragOffset = .zero
-            }
+            resetCardPosition()
         }
     }
+
+    private func performSwipeAnimation(isSwipeRight: Bool) {
+        withAnimation(.easeInOut(duration: Constants.swipeAnimationDuration)) {
+            dragOffset.width = isSwipeRight ? Constants.swipeOffscreenDistance : -Constants.swipeOffscreenDistance
+            cardOpacity = 0.0
+        }
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + Constants.swipeAnimationDuration) {
+            if isSwipeRight {
+                onSwipeRight()
+            } else {
+                onSwipeLeft()
+            }
+            resetCardAppearance()
+        }
+    }
+
+    private func resetCardPosition() {
+        withAnimation {
+            dragOffset = .zero
+        }
+    }
+
+    private func resetCardAppearance() {
+        dragOffset = .zero
+        cardOpacity = 1.0
+    }
+
 }
 
 struct FlashcardViewPreview: View {
