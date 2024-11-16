@@ -14,9 +14,17 @@ public struct FlashcardView: View {
         static let cardHeight: CGFloat = 450
         static let cornerRadius: CGFloat = 10
         static let minScaleFactor: CGFloat = 0.8
+        static let swipeThreshold: CGFloat = 100
+        static let swipeOffscreenDistance: CGFloat = 1000
+        static let swipeAnimationDuration = 0.4
     }
 
+    @State private var dragOffset: CGSize = .zero
+    @State private var cardOpacity: Double = 1.0
     @Binding var isFlipped: Bool
+
+    let onSwipeRight: () -> Void
+    let onSwipeLeft: () -> Void
 
     let frontText: String
     let backText: String
@@ -37,6 +45,18 @@ public struct FlashcardView: View {
     private var cardView: some View {
         flashcard
             .id(isFlipped)
+            .offset(x: dragOffset.width)
+            .gesture(
+                DragGesture()
+                    .onChanged { value in
+                        if isFlipped {
+                            dragOffset = value.translation
+                        }
+                    }
+                    .onEnded { value in
+                        handleSwipe(value: value)
+                    }
+            )
             .transition(.flip(side: isFlipped ? .back : .front,
                               axis: axis,
                               animationDuration: animationDuration))
@@ -61,6 +81,40 @@ public struct FlashcardView: View {
             .padding()
             .minimumScaleFactor(Constants.minScaleFactor)
     }
+
+    private func handleSwipe(value: DragGesture.Value) {
+        guard isFlipped else {
+            withAnimation {
+                dragOffset = .zero
+            }
+            return
+        }
+
+        let isSwipeRight = value.translation.width > Constants.swipeThreshold
+        let isSwipeLeft = value.translation.width < -Constants.swipeThreshold
+
+        if isSwipeRight || isSwipeLeft {
+            withAnimation(.easeInOut(duration: Constants.swipeAnimationDuration)) {
+                dragOffset.width = isSwipeRight ? Constants.swipeOffscreenDistance : -Constants.swipeOffscreenDistance
+                cardOpacity = 0.0
+            }
+
+            DispatchQueue.main.asyncAfter(deadline: .now() + Constants.swipeAnimationDuration) {
+                if isSwipeRight {
+                    onSwipeRight()
+                } else if isSwipeLeft {
+                    onSwipeLeft()
+                }
+
+                dragOffset = .zero
+                cardOpacity = 1.0
+            }
+        } else {
+            withAnimation {
+                dragOffset = .zero
+            }
+        }
+    }
 }
 
 struct FlashcardViewPreview: View {
@@ -69,6 +123,12 @@ struct FlashcardViewPreview: View {
     var body: some View {
         FlashcardView(
             isFlipped: $isFlipped,
+            onSwipeRight: {
+                print("Swiped Right - Correct Answer")
+            },
+            onSwipeLeft: {
+                print("Swiped Left - Incorrect Answer")
+            },
             frontText: "Hello, World!",
             backText: "Goodbye, World!",
             frontColor: .blue,

@@ -56,6 +56,8 @@ public struct FlashcardDeckView: View {
             if !currentDeck.isEmpty {
                 FlashcardView(
                     isFlipped: $isFlipped,
+                    onSwipeRight: markCorrect,
+                    onSwipeLeft: markIncorrect,
                     frontText: currentDeck[currentIndex].frontText,
                     backText: currentDeck[currentIndex].backText,
                     frontColor: frontColor,
