@@ -21,24 +21,6 @@ public struct FlashcardView: View {
         static let swipeAnimationDuration = 0.4
     }
 
-    // MARK: - Axis3D Struct
-
-    // MARK: - Axis3D Enum
-
-    private enum Axis3D {
-        case horizontal
-        case vertical
-
-        var values: (x: CGFloat, y: CGFloat, z: CGFloat) {
-            switch self {
-            case .horizontal:
-                return (0, 1, 0)
-            case .vertical:
-                return (1, 0, 0)
-            }
-        }
-    }
-
     // MARK: - State
 
     @State private var dragOffset: CGSize = .zero
@@ -132,7 +114,7 @@ public struct FlashcardView: View {
         }
     }
     // swiftlint:enable large_tuple
-    
+
     private func handleTap() {
         withAnimation(.easeInOut(duration: animationDuration)) {
             isFlipped.toggle()
