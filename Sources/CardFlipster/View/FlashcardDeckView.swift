@@ -8,6 +8,11 @@
 import SwiftUI
 
 public struct FlashcardDeckView: View {
+
+    private enum Constants {
+        static let actionButtonsHeight: CGFloat = 80
+    }
+
     private var flashcards: [Flashcard]
 
     let frontColor: Color
@@ -69,10 +74,19 @@ public struct FlashcardDeckView: View {
 
             Spacer()
 
+            fixedActionButtons
+        }
+    }
+
+    private var fixedActionButtons: some View {
+        VStack {
             if isFlipped {
                 actionButtons
+            } else {
+                Spacer().frame(height: Constants.actionButtonsHeight)
             }
         }
+        .animation(.easeInOut, value: isFlipped)
     }
 
     private var actionButtons: some View {
@@ -95,6 +109,7 @@ public struct FlashcardDeckView: View {
             }
             .disabled(currentDeck.isEmpty)
         }
+        .frame(height: Constants.actionButtonsHeight)
         .padding(.horizontal)
     }
 
