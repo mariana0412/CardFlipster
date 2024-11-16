@@ -17,6 +17,12 @@ struct FlipTransitionViewModifier: ViewModifier {
         case back
     }
 
+    struct Axis3D {
+        let axisX: CGFloat
+        let axisY: CGFloat
+        let axisZ: CGFloat
+    }
+
     let isActive: Bool
     let side: Side
     let axis: Axis
@@ -26,7 +32,7 @@ struct FlipTransitionViewModifier: ViewModifier {
         content
             .rotation3DEffect(
                 Angle.degrees(side == .back ? 0 : 180),
-                axis: resolvedAxis,
+                axis: (resolvedAxis.axisX, resolvedAxis.axisY, resolvedAxis.axisZ),
                 perspective: 0
             )
             .rotation3DEffect(
@@ -35,17 +41,17 @@ struct FlipTransitionViewModifier: ViewModifier {
                         ? (side == .back ? 180 : 0)
                         : (side == .back ? 0 : 180)
                 ),
-                axis: resolvedAxis,
+                axis: (resolvedAxis.axisX, resolvedAxis.axisY, resolvedAxis.axisZ),
                 perspective: perspective
             )
     }
 
-    private var resolvedAxis: (CGFloat, CGFloat, CGFloat) {
+    private var resolvedAxis: Axis3D {
         switch axis {
         case .horizontal:
-            (0, 1, 0)
+            return Axis3D(axisX: 0, axisY: 1, axisZ: 0)
         case .vertical:
-            (1, 0, 0)
+            return Axis3D(axisX: 1, axisY: 0, axisZ: 0)
         }
     }
 
