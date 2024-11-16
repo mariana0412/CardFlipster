@@ -11,7 +11,7 @@ import SwiftUI
 // https://stackoverflow.com/a/79162092
 // Answer by Robert Dresler
 extension AnyTransition {
-    
+
     @MainActor static func flip(side: FlipTransitionViewModifier.Side,
                                 axis: Axis = .horizontal,
                                 perspective: CGFloat = 0,
