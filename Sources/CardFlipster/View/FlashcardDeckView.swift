@@ -10,10 +10,15 @@ import SwiftUI
 public struct FlashcardDeckView: View {
 
     private enum Constants {
+        static let progressBarSpacing: CGFloat = 5
+        static let progressBarHeightScale: CGFloat = 2
+
         static let actionButtonsHeight: CGFloat = 80
     }
 
-    private var flashcards: [Flashcard]
+    // MARK: - Properties
+
+    @StateObject private var viewModel: FlashcardDeckViewModel
 
     let frontColor: Color
     let backColor: Color
@@ -23,10 +28,7 @@ public struct FlashcardDeckView: View {
     let axis: Axis
     let animationDuration: TimeInterval
 
-    @State private var currentIndex: Int = 0
-    @State private var incorrectCards: [Flashcard] = []
-    @State private var currentDeck: [Flashcard]
-    @State private var isFlipped: Bool = false
+    // MARK: - Init
 
     public init(
         flashcards: [Flashcard],
@@ -38,7 +40,7 @@ public struct FlashcardDeckView: View {
         axis: Axis = .horizontal,
         animationDuration: TimeInterval = 0.6
     ) {
-        self.flashcards = flashcards
+        _viewModel = StateObject(wrappedValue: FlashcardDeckViewModel(flashcards: flashcards))
         self.frontColor = frontColor
         self.backColor = backColor
         self.font = font
@@ -46,20 +48,25 @@ public struct FlashcardDeckView: View {
         self.backFontColor = backFontColor
         self.axis = axis
         self.animationDuration = animationDuration
-        self._currentDeck = State(initialValue: flashcards)
     }
+
+    // MARK: - Body
 
     public var body: some View {
         VStack {
+            progressView
+
             Spacer()
 
-            if !currentDeck.isEmpty {
+            if viewModel.roundCompleted {
+                statisticsView
+            } else if !viewModel.currentDeck.isEmpty {
                 FlashcardView(
-                    isFlipped: $isFlipped,
-                    onSwipeRight: markCorrect,
-                    onSwipeLeft: markIncorrect,
-                    frontText: currentDeck[currentIndex].frontText,
-                    backText: currentDeck[currentIndex].backText,
+                    isFlipped: $viewModel.isFlipped,
+                    onSwipeRight: viewModel.markCorrect,
+                    onSwipeLeft: viewModel.markIncorrect,
+                    frontText: viewModel.currentDeck[viewModel.currentIndex].frontText,
+                    backText: viewModel.currentDeck[viewModel.currentIndex].backText,
                     frontColor: frontColor,
                     backColor: backColor,
                     font: font,
@@ -69,7 +76,7 @@ public struct FlashcardDeckView: View {
                     animationDuration: animationDuration
                 )
             } else {
-                Text("Well done! You've answered all cards correctly!")
+                Text("You've completed all cards!")
                     .font(.headline)
                     .padding()
             }
@@ -80,71 +87,82 @@ public struct FlashcardDeckView: View {
         }
     }
 
+    // MARK: - Subviews
+
+    private var progressView: some View {
+        VStack(spacing: Constants.progressBarSpacing) {
+            ProgressView(value: progressValue, total: 1.0)
+                .progressViewStyle(LinearProgressViewStyle(tint: .blue))
+                .scaleEffect(x: 1, y: Constants.progressBarHeightScale, anchor: .center)
+                .padding(.horizontal)
+
+            Text("\(viewModel.currentIndex)/\(viewModel.currentDeck.count)")
+                .font(.caption)
+                .foregroundColor(.gray)
+        }
+        .padding(.top)
+    }
+
+    private var progressValue: Double {
+        guard viewModel.currentDeck.count > 0 else { return 0 }
+        return Double(viewModel.correctAnswers + viewModel.incorrectAnswers) / Double(viewModel.currentDeck.count)
+    }
+
+    private var statisticsView: some View {
+        VStack(spacing: 20) {
+            Text("Round Summary")
+                .font(.headline)
+
+            Text("Correct: \(viewModel.correctAnswers)")
+                .foregroundColor(.green)
+
+            Text("Incorrect: \(viewModel.incorrectAnswers)")
+                .foregroundColor(.red)
+
+            Button("Continue learning") {
+                viewModel.restartWithIncorrectCards()
+            }
+            .padding()
+            .background(Color.blue)
+            .foregroundColor(.white)
+            .cornerRadius(10)
+        }
+        .padding()
+    }
+
     private var fixedActionButtons: some View {
         VStack {
-            if isFlipped {
+            if viewModel.isFlipped {
                 actionButtons
             } else {
                 Spacer().frame(height: Constants.actionButtonsHeight)
             }
         }
-        .animation(.easeInOut, value: isFlipped)
+        .animation(.easeInOut, value: viewModel.isFlipped)
     }
 
     private var actionButtons: some View {
         HStack {
-            Button(action: markIncorrect) {
+            Button(action: viewModel.markIncorrect) {
                 Image(systemName: "xmark.circle")
                     .font(.largeTitle)
                     .foregroundColor(.red)
                     .padding()
             }
-            .disabled(currentDeck.isEmpty)
+            .disabled(viewModel.currentDeck.isEmpty)
 
             Spacer()
 
-            Button(action: markCorrect) {
+            Button(action: viewModel.markCorrect) {
                 Image(systemName: "checkmark.circle")
                     .font(.largeTitle)
                     .foregroundColor(.green)
                     .padding()
             }
-            .disabled(currentDeck.isEmpty)
+            .disabled(viewModel.currentDeck.isEmpty)
         }
         .frame(height: Constants.actionButtonsHeight)
         .padding(.horizontal)
-    }
-
-    private func markCorrect() {
-        moveToNextCard()
-    }
-
-    private func markIncorrect() {
-        incorrectCards.append(currentDeck[currentIndex])
-        moveToNextCard()
-    }
-
-    private func moveToNextCard() {
-        if currentIndex < currentDeck.count - 1 {
-            currentIndex += 1
-        } else {
-            restartWithIncorrectCards()
-        }
-        resetFlipState()
-    }
-
-    private func restartWithIncorrectCards() {
-        if incorrectCards.isEmpty {
-            currentDeck = []
-        } else {
-            currentDeck = incorrectCards
-            incorrectCards = []
-        }
-        currentIndex = 0
-    }
-
-    private func resetFlipState() {
-        isFlipped = false
     }
 }
 
