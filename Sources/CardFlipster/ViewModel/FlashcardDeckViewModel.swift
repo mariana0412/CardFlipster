@@ -50,7 +50,6 @@ public class FlashcardDeckViewModel: ObservableObject {
         roundCompleted = false
     }
 
-
     func resetFlipState() {
         isFlipped = false
     }

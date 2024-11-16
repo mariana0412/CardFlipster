@@ -77,10 +77,6 @@ public struct FlashcardDeckView: View {
                     axis: axis,
                     animationDuration: animationDuration
                 )
-            } else {
-                Text("You've completed all cards!")
-                    .font(.headline)
-                    .padding()
             }
 
             Spacer()
@@ -112,22 +108,28 @@ public struct FlashcardDeckView: View {
 
     private var statisticsView: some View {
         VStack(spacing: 20) {
-            Text("Round Summary")
-                .font(.headline)
+            if viewModel.incorrectAnswers == 0 {
+                Text("You've completed all cards!")
+                    .font(.headline)
+                    .foregroundColor(.green)
+            } else {
+                Text("Round Summary")
+                    .font(.headline)
 
-            Text("Correct: \(viewModel.correctAnswers)")
-                .foregroundColor(.green)
+                Text("Correct: \(viewModel.correctAnswers)")
+                    .foregroundColor(.green)
 
-            Text("Incorrect: \(viewModel.incorrectAnswers)")
-                .foregroundColor(.red)
+                Text("Incorrect: \(viewModel.incorrectAnswers)")
+                    .foregroundColor(.red)
 
-            Button("Continue learning") {
-                viewModel.restartWithIncorrectCards()
+                Button("Continue learning") {
+                    viewModel.restartWithIncorrectCards()
+                }
+                .padding()
+                .background(Color.blue)
+                .foregroundColor(.white)
+                .cornerRadius(10)
             }
-            .padding()
-            .background(Color.blue)
-            .foregroundColor(.white)
-            .cornerRadius(10)
         }
         .padding()
     }
