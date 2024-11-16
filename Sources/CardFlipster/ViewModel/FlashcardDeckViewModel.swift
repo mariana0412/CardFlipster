@@ -18,8 +18,8 @@ public class FlashcardDeckViewModel: ObservableObject {
     @Published var currentIndex: Int = 0
     @Published var isFlipped: Bool = false
     @Published var roundCompleted: Bool = false
-    @Published var correctAnswers: Int = 0
-    @Published var incorrectAnswers: Int = 0
+    @Published var correctAnswersCount: Int = 0
+    @Published var incorrectAnswersCount: Int = 0
 
     // MARK: - Initialization
 
@@ -31,12 +31,12 @@ public class FlashcardDeckViewModel: ObservableObject {
     // MARK: - Methods
 
     func markCorrect() {
-        correctAnswers += 1
+        correctAnswersCount += 1
         moveToNextCard()
     }
 
     func markIncorrect() {
-        incorrectAnswers += 1
+        incorrectAnswersCount += 1
         incorrectCards.append(currentDeck[currentIndex])
         moveToNextCard()
     }
@@ -44,8 +44,8 @@ public class FlashcardDeckViewModel: ObservableObject {
     func restartWithIncorrectCards() {
         currentDeck = incorrectCards
         incorrectCards = []
-        correctAnswers = 0
-        incorrectAnswers = 0
+        correctAnswersCount = 0
+        incorrectAnswersCount = 0
         currentIndex = 0
         roundCompleted = false
     }

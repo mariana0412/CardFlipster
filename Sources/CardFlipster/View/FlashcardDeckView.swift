@@ -61,7 +61,14 @@ public struct FlashcardDeckView: View {
             Spacer()
 
             if viewModel.roundCompleted {
-                statisticsView
+                StatisticsView(
+                    correctAnswers: viewModel.correctAnswersCount,
+                    incorrectAnswers: viewModel.incorrectAnswersCount,
+                    onContinue: viewModel.incorrectAnswersCount > 0 ? viewModel.restartWithIncorrectCards : nil,
+                    frontColor: frontColor,
+                    backColor: backColor,
+                    fontColor: frontFontColor
+                )
             } else if !viewModel.currentDeck.isEmpty {
                 FlashcardView(
                     isFlipped: $viewModel.isFlipped,
@@ -103,36 +110,14 @@ public struct FlashcardDeckView: View {
 
     private var progressValue: Double {
         guard viewModel.currentDeck.count > 0 else { return 0 }
-        return Double(viewModel.correctAnswers + viewModel.incorrectAnswers) / Double(viewModel.currentDeck.count)
+        return Double(viewModel.correctAnswersCount + viewModel.incorrectAnswersCount)
+        / Double(viewModel.currentDeck.count)
     }
 
-    private var statisticsView: some View {
-        VStack(spacing: 20) {
-            if viewModel.incorrectAnswers == 0 {
-                Text("You've completed all cards!")
-                    .font(.headline)
-                    .foregroundColor(.green)
-            } else {
-                Text("Round Summary")
-                    .font(.headline)
-
-                Text("Correct: \(viewModel.correctAnswers)")
-                    .foregroundColor(.green)
-
-                Text("Incorrect: \(viewModel.incorrectAnswers)")
-                    .foregroundColor(.red)
-
-                Button("Continue learning") {
-                    viewModel.restartWithIncorrectCards()
-                }
-                .padding()
-                .background(Color.blue)
-                .foregroundColor(.white)
-                .cornerRadius(10)
-            }
-        }
-        .padding()
-    }
+    static let correctColor: Color = .green
+    static let incorrectColor: Color = .red
+    static let buttonColor: Color = .blue
+    static let buttonTextColor: Color = .white
 
     private var fixedActionButtons: some View {
         VStack {
