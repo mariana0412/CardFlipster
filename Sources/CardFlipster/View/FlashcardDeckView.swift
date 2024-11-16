@@ -54,7 +54,9 @@ public struct FlashcardDeckView: View {
 
     public var body: some View {
         VStack {
-            progressView
+            if !viewModel.roundCompleted {
+                progressView
+            }
 
             Spacer()
 
