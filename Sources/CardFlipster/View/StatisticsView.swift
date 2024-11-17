@@ -12,14 +12,6 @@ struct StatisticsView: View {
     // MARK: - Constants
 
     enum Constants {
-        // Texts
-        static let completedTitle = "You've completed all cards!"
-        static let completedSubtitle = "Great job! All answers are correct!"
-        static let roundSummaryTitle = "Round Summary"
-        static let correctText = "Correct"
-        static let incorrectText = "Incorrect"
-        static let continueLearningButtonText = "Continue learning"
-
         // Layout
         static let spacingLarge: CGFloat = 30
         static let spacingMedium: CGFloat = 20
@@ -47,11 +39,7 @@ struct StatisticsView: View {
             uiConfig.backgroundColor
 
             VStack(spacing: Constants.spacingLarge) {
-                if incorrectAnswers == 0 {
-                    completedView
-                } else {
-                    roundSummaryView
-                }
+                roundSummaryView
             }
             .padding()
         }
@@ -59,37 +47,24 @@ struct StatisticsView: View {
 
     // MARK: - Subviews
 
-    private var completedView: some View {
-        VStack(spacing: Constants.spacingSmall) {
-            Text(Constants.completedTitle)
-                .font(uiConfig.titleFont)
-                .foregroundColor(uiConfig.textColor)
-                .multilineTextAlignment(.center)
-
-            Text(Constants.completedSubtitle)
-                .font(uiConfig.subtitleFont)
-                .foregroundColor(.gray)
-        }
-    }
-
     private var roundSummaryView: some View {
         VStack(spacing: Constants.spacingMedium) {
-            Text(Constants.roundSummaryTitle)
+            Text(uiConfig.roundSummaryTitle)
                 .font(uiConfig.titleFont)
                 .foregroundColor(uiConfig.textColor)
 
             HStack(spacing: Constants.spacingMedium) {
-                statisticsCard(title: Constants.correctText,
+                statisticsCard(title: uiConfig.correctText,
                          value: "\(correctAnswers)",
                          textColor: .green)
-                statisticsCard(title: Constants.incorrectText,
+                statisticsCard(title: uiConfig.incorrectText,
                          value: "\(incorrectAnswers)",
                          textColor: .red)
             }
 
             if let onContinue = onContinue {
                 Button(action: onContinue) {
-                    Text(Constants.continueLearningButtonText)
+                    Text(uiConfig.continueLearningButtonText)
                         .padding()
                         .frame(maxWidth: .infinity)
                         .background(uiConfig.buttonBackgroundColor)

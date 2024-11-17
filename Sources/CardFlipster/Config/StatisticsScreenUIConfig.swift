@@ -14,6 +14,10 @@ public struct StatisticsScreenUIConfig {
     public let textColor: Color
     public let buttonBackgroundColor: Color
     public let buttonTextColor: Color
+    public let roundSummaryTitle: String
+    public let correctText: String
+    public let incorrectText: String
+    public let continueLearningButtonText: String
 
     public init(
         backgroundColor: LinearGradient,
@@ -21,7 +25,11 @@ public struct StatisticsScreenUIConfig {
         subtitleFont: Font,
         textColor: Color,
         buttonBackgroundColor: Color,
-        buttonTextColor: Color
+        buttonTextColor: Color,
+        roundSummaryTitle: String = "Round Summary",
+        correctText: String = "Correct",
+        incorrectText: String = "Incorrect",
+        continueLearningButtonText: String = "Continue learning"
     ) {
         self.backgroundColor = backgroundColor
         self.titleFont = titleFont
@@ -29,6 +37,10 @@ public struct StatisticsScreenUIConfig {
         self.textColor = textColor
         self.buttonBackgroundColor = buttonBackgroundColor
         self.buttonTextColor = buttonTextColor
+        self.roundSummaryTitle = roundSummaryTitle
+        self.correctText = correctText
+        self.incorrectText = incorrectText
+        self.continueLearningButtonText = continueLearningButtonText
     }
 
 }
