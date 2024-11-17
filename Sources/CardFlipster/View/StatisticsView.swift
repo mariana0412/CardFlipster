@@ -79,8 +79,12 @@ struct StatisticsView: View {
                 .foregroundColor(uiConfig.textColor)
 
             HStack(spacing: Constants.spacingMedium) {
-                statCard(title: Constants.correctText, value: "\(correctAnswers)", color: .green)
-                statCard(title: Constants.incorrectText, value: "\(incorrectAnswers)", color: .red)
+                statisticsCard(title: Constants.correctText,
+                         value: "\(correctAnswers)",
+                         textColor: .green)
+                statisticsCard(title: Constants.incorrectText,
+                         value: "\(incorrectAnswers)",
+                         textColor: .red)
             }
 
             if let onContinue = onContinue {
@@ -98,11 +102,11 @@ struct StatisticsView: View {
         }
     }
 
-    private func statCard(title: String, value: String, color: Color) -> some View {
+    private func statisticsCard(title: String, value: String, textColor: Color) -> some View {
         VStack(spacing: Constants.spacingSmall) {
             Text(value)
                 .font(.title2)
-                .foregroundColor(color)
+                .foregroundColor(textColor)
 
             Text(title)
                 .font(.title2)
@@ -121,4 +125,5 @@ struct StatisticsView: View {
             y: Constants.cardShadowOffsetY
         )
     }
+
 }
