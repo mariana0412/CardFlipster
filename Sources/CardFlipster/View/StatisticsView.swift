@@ -67,8 +67,8 @@ struct StatisticsView: View {
                     Text(uiConfig.continueLearningButtonText)
                         .padding()
                         .frame(maxWidth: .infinity)
-                        .background(uiConfig.buttonBackgroundColor)
-                        .foregroundColor(uiConfig.buttonTextColor)
+                        .background(uiConfig.continueButtonBackgroundColor)
+                        .foregroundColor(uiConfig.continueButtonTextColor)
                         .cornerRadius(Constants.buttonCornerRadius)
                         .font(.headline)
                 }

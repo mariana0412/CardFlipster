@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-public class FlashcardDeckViewModel: ObservableObject {
+class FlashcardDeckViewModel: ObservableObject {
 
     // MARK: - Properties
 
