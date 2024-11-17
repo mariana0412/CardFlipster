@@ -48,8 +48,9 @@ pod init
 ```
 3. Open the newly created Podfile in your project directory and add the following line under your target:
 ```ruby
-pod 'CardFlipster', '~> 1.0.0'
+pod 'CardFlipster', '0.0.1'
 ```
+Make sure to check for the latest available version on [CardFlipster CocoaPods page](https://cocoapods.org/pods/CardFlipster) and replace 0.0.1 with it.
 4. Install the Pod - save the Podfile and run the following command in the terminal:
 ```ruby
 pod install
