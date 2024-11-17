@@ -195,3 +195,6 @@ struct CardFlipsterCustomTheme: View {
     }
 }
 ```
+
+## License
+CardFlipster is licensed under the [MIT License](https://github.com/mariana0412/CardFlipster/blob/main/LICENSE).
