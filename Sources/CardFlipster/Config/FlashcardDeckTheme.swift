@@ -7,9 +7,15 @@
 
 import SwiftUI
 
+/// A theme for `FlashcardDeckView`.
 public enum FlashcardDeckTheme {
+
+    /// A light theme with default light colors.
     case light
+    /// A dark theme with default dark colors.
     case dark
+    /// A custom theme with user-defined configurations.
+        /// - Parameter config: The `FlashcardDeckUIConfig` containing custom configurations.
     case custom(FlashcardDeckUIConfig)
 
     var config: FlashcardDeckUIConfig {

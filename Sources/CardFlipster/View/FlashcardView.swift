@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-public struct FlashcardView: View {
+struct FlashcardView: View {
 
     // MARK: - Constants
 

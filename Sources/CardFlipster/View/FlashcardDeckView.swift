@@ -7,6 +7,7 @@
 
 import SwiftUI
 
+/// A SwiftUI view that displays a deck of flashcards.
 public struct FlashcardDeckView: View {
 
     private enum Constants {
@@ -24,6 +25,10 @@ public struct FlashcardDeckView: View {
 
     // MARK: - Init
 
+    /// Creates a flashcard deck view with the given flashcards and theme.
+    /// - Parameters:
+    ///   - flashcards: An array of `Flashcard` objects to be displayed in the deck.
+    ///   - theme: The theme for configuring the appearance of the flashcard deck.
     public init(flashcards: [Flashcard], theme: FlashcardDeckTheme = .light) {
         _viewModel = StateObject(wrappedValue: FlashcardDeckViewModel(flashcards: flashcards))
         self.uiConfig = theme.config
@@ -31,6 +36,7 @@ public struct FlashcardDeckView: View {
 
     // MARK: - Body
 
+    /// The content and behavior of the flashcard deck view.
     public var body: some View {
         ZStack {
             VStack {
@@ -129,48 +135,5 @@ public struct FlashcardDeckView: View {
         .frame(height: Constants.actionButtonsHeight)
         .padding(.horizontal)
     }
-}
 
-#Preview {
-    var flashcards: [Flashcard] {
-        [
-            Flashcard(frontText: "What is the capital of Ukraine?", backText: "Kyiv"),
-            Flashcard(frontText: "What is the capital of France?", backText: "Paris"),
-            Flashcard(frontText: "What is the capital of Italy?", backText: "Rome")
-        ]
-    }
-
-    let softLavender = Color(red: 220/255, green: 180/255, blue: 255/255)
-    let pastelPink = Color(red: 255/255, green: 200/255, blue: 230/255)
-
-    let flashcardConfig = FlashcardUIConfig(
-        frontColor: softLavender,
-        backColor: pastelPink,
-        font: .title,
-        frontFontColor: .white,
-        backFontColor: .white,
-        progressBarColor: pastelPink
-    )
-
-    let statisticsConfig = StatisticsScreenUIConfig(
-        backgroundColor: LinearGradient(
-            gradient: Gradient(colors: [softLavender, pastelPink]),
-            startPoint: .top,
-            endPoint: .bottom
-        ),
-        titleFont: .largeTitle,
-        subtitleFont: .headline,
-        textColor: .white,
-        buttonBackgroundColor: softLavender,
-        buttonTextColor: .white
-    )
-
-    let customTheme = FlashcardDeckTheme.custom(
-        FlashcardDeckUIConfig(
-            flashcardConfig: flashcardConfig,
-            statisticsConfig: statisticsConfig
-        )
-    )
-
-    return FlashcardDeckView(flashcards: flashcards, theme: .dark)
 }
