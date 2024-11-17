@@ -20,76 +20,57 @@ public struct FlashcardDeckView: View {
 
     @StateObject private var viewModel: FlashcardDeckViewModel
 
-    let frontColor: Color
-    let backColor: Color
-    let font: Font
-    let frontFontColor: Color
-    let backFontColor: Color
-    let axis: Axis
-    let animationDuration: TimeInterval
+    private let uiConfig: FlashcardDeckUIConfig
 
     // MARK: - Init
 
-    public init(
-        flashcards: [Flashcard],
-        frontColor: Color = .blue,
-        backColor: Color = .yellow,
-        font: Font = .title,
-        frontFontColor: Color = .white,
-        backFontColor: Color = .white,
-        axis: Axis = .horizontal,
-        animationDuration: TimeInterval = 0.6
-    ) {
+    public init(flashcards: [Flashcard], theme: FlashcardDeckTheme = .light) {
         _viewModel = StateObject(wrappedValue: FlashcardDeckViewModel(flashcards: flashcards))
-        self.frontColor = frontColor
-        self.backColor = backColor
-        self.font = font
-        self.frontFontColor = frontFontColor
-        self.backFontColor = backFontColor
-        self.axis = axis
-        self.animationDuration = animationDuration
+        self.uiConfig = theme.config
     }
 
     // MARK: - Body
 
     public var body: some View {
-        VStack {
-            if !viewModel.roundCompleted {
-                progressView
-            }
+        ZStack {
+            VStack {
+                if !viewModel.roundCompleted {
+                    progressView
+                }
 
-            Spacer()
+                Spacer()
+
+                if !viewModel.roundCompleted {
+                    FlashcardView(
+                        isFlipped: $viewModel.isFlipped,
+                        onSwipeRight: viewModel.markCorrect,
+                        onSwipeLeft: viewModel.markIncorrect,
+                        frontText: viewModel.currentDeck[viewModel.currentIndex].frontText,
+                        backText: viewModel.currentDeck[viewModel.currentIndex].backText,
+                        uiConfig: uiConfig.flashcardConfig,
+                        axis: .horizontal,
+                        animationDuration: 0.6
+                    )
+                }
+
+                Spacer()
+
+                if !viewModel.roundCompleted {
+                    fixedActionButtons
+                }
+            }
 
             if viewModel.roundCompleted {
                 StatisticsView(
                     correctAnswers: viewModel.correctAnswersCount,
                     incorrectAnswers: viewModel.incorrectAnswersCount,
                     onContinue: viewModel.incorrectAnswersCount > 0 ? viewModel.restartWithIncorrectCards : nil,
-                    frontColor: frontColor,
-                    backColor: backColor,
-                    fontColor: frontFontColor
+                    uiConfig: uiConfig.statisticsConfig
                 )
-            } else if !viewModel.currentDeck.isEmpty {
-                FlashcardView(
-                    isFlipped: $viewModel.isFlipped,
-                    onSwipeRight: viewModel.markCorrect,
-                    onSwipeLeft: viewModel.markIncorrect,
-                    frontText: viewModel.currentDeck[viewModel.currentIndex].frontText,
-                    backText: viewModel.currentDeck[viewModel.currentIndex].backText,
-                    frontColor: frontColor,
-                    backColor: backColor,
-                    font: font,
-                    frontFontColor: frontFontColor,
-                    backFontColor: backFontColor,
-                    axis: axis,
-                    animationDuration: animationDuration
-                )
+                .edgesIgnoringSafeArea(.all)
             }
-
-            Spacer()
-
-            fixedActionButtons
         }
+        .animation(viewModel.roundCompleted ? nil : .easeInOut, value: viewModel.roundCompleted)
     }
 
     // MARK: - Subviews
@@ -97,7 +78,7 @@ public struct FlashcardDeckView: View {
     private var progressView: some View {
         VStack(spacing: Constants.progressBarSpacing) {
             ProgressView(value: progressValue, total: 1.0)
-                .progressViewStyle(LinearProgressViewStyle(tint: .blue))
+                .progressViewStyle(LinearProgressViewStyle(tint: uiConfig.flashcardConfig.progressBarColor))
                 .scaleEffect(x: 1, y: Constants.progressBarHeightScale, anchor: .center)
                 .padding(.horizontal)
 
@@ -113,11 +94,6 @@ public struct FlashcardDeckView: View {
         return Double(viewModel.correctAnswersCount + viewModel.incorrectAnswersCount)
         / Double(viewModel.currentDeck.count)
     }
-
-    static let correctColor: Color = .green
-    static let incorrectColor: Color = .red
-    static let buttonColor: Color = .blue
-    static let buttonTextColor: Color = .white
 
     private var fixedActionButtons: some View {
         VStack {
@@ -155,27 +131,46 @@ public struct FlashcardDeckView: View {
     }
 }
 
-struct FlashcardDeckPreview: View {
-    var body: some View {
-        FlashcardDeckView(
-            flashcards: sampleFlashcards,
-            frontColor: .blue,
-            backColor: .orange,
-            font: .headline,
-            axis: .horizontal,
-            animationDuration: 0.5
-        )
-    }
-
-    private var sampleFlashcards: [Flashcard] {
+#Preview {
+    var flashcards: [Flashcard] {
         [
             Flashcard(frontText: "What is the capital of Ukraine?", backText: "Kyiv"),
             Flashcard(frontText: "What is the capital of France?", backText: "Paris"),
             Flashcard(frontText: "What is the capital of Italy?", backText: "Rome")
         ]
     }
-}
 
-#Preview {
-    FlashcardDeckPreview()
+    let softLavender = Color(red: 220/255, green: 180/255, blue: 255/255)
+    let pastelPink = Color(red: 255/255, green: 200/255, blue: 230/255)
+
+    let flashcardConfig = FlashcardUIConfig(
+        frontColor: softLavender,
+        backColor: pastelPink,
+        font: .title,
+        frontFontColor: .white,
+        backFontColor: .white,
+        progressBarColor: pastelPink
+    )
+
+    let statisticsConfig = StatisticsScreenUIConfig(
+        backgroundColor: LinearGradient(
+            gradient: Gradient(colors: [softLavender, pastelPink]),
+            startPoint: .top,
+            endPoint: .bottom
+        ),
+        titleFont: .largeTitle,
+        subtitleFont: .headline,
+        textColor: .white,
+        buttonBackgroundColor: softLavender,
+        buttonTextColor: .white
+    )
+
+    let customTheme = FlashcardDeckTheme.custom(
+        FlashcardDeckUIConfig(
+            flashcardConfig: flashcardConfig,
+            statisticsConfig: statisticsConfig
+        )
+    )
+
+    return FlashcardDeckView(flashcards: flashcards, theme: .dark)
 }
