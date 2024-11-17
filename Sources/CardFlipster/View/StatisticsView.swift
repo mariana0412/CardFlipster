@@ -9,7 +9,10 @@ import SwiftUI
 
 struct StatisticsView: View {
 
+    // MARK: - Constants
+
     enum Constants {
+        // Texts
         static let completedTitle = "You've completed all cards!"
         static let completedSubtitle = "Great job! All answers are correct!"
         static let roundSummaryTitle = "Round Summary"
@@ -17,28 +20,33 @@ struct StatisticsView: View {
         static let incorrectText = "Incorrect"
         static let continueLearningButtonText = "Continue learning"
 
-        static let correctColor: Color = .green
-        static let incorrectColor: Color = .red
-        static let buttonColor: Color = .blue
-        static let buttonTextColor: Color = .white
+        // Layout
+        static let spacingLarge: CGFloat = 30
+        static let spacingMedium: CGFloat = 20
+        static let spacingSmall: CGFloat = 10
+        static let buttonPadding: CGFloat = 20
+        static let buttonCornerRadius: CGFloat = 12
+        static let cardCornerRadius: CGFloat = 10
+        static let cardShadowOpacity: CGFloat = 0.1
+        static let cardShadowRadius: CGFloat = 5
+        static let cardShadowOffsetY: CGFloat = 2
+        static let cardBackgroundOpacity: CGFloat = 0.8
     }
+
+    // MARK: - Properties
 
     let correctAnswers: Int
     let incorrectAnswers: Int
     let onContinue: (() -> Void)?
+    let uiConfig: StatisticsScreenUIConfig
 
-    let frontColor: Color
-    let backColor: Color
-    let fontColor: Color
+    // MARK: - Body
 
     var body: some View {
         ZStack {
-            LinearGradient(
-                gradient: Gradient(colors: [frontColor.opacity(0.5), backColor.opacity(0.5)]),
-                startPoint: .top,
-                endPoint: .bottom
-            )
-            VStack(spacing: 30) {
+            uiConfig.backgroundColor
+
+            VStack(spacing: Constants.spacingLarge) {
                 if incorrectAnswers == 0 {
                     completedView
                 } else {
@@ -49,28 +57,30 @@ struct StatisticsView: View {
         }
     }
 
+    // MARK: - Subviews
+
     private var completedView: some View {
-        VStack(spacing: 10) {
+        VStack(spacing: Constants.spacingSmall) {
             Text(Constants.completedTitle)
-                .font(.largeTitle)
-                .foregroundColor(fontColor)
+                .font(uiConfig.titleFont)
+                .foregroundColor(uiConfig.textColor)
                 .multilineTextAlignment(.center)
 
             Text(Constants.completedSubtitle)
-                .font(.subheadline)
+                .font(uiConfig.subtitleFont)
                 .foregroundColor(.gray)
         }
     }
 
     private var roundSummaryView: some View {
-        VStack(spacing: 10) {
+        VStack(spacing: Constants.spacingMedium) {
             Text(Constants.roundSummaryTitle)
-                .font(.largeTitle)
-                .foregroundColor(fontColor)
+                .font(uiConfig.titleFont)
+                .foregroundColor(uiConfig.textColor)
 
-            HStack(spacing: 20) {
-                statCard(title: Constants.correctText, value: "\(correctAnswers)", color: Constants.correctColor)
-                statCard(title: Constants.incorrectText, value: "\(incorrectAnswers)", color: Constants.incorrectColor)
+            HStack(spacing: Constants.spacingMedium) {
+                statCard(title: Constants.correctText, value: "\(correctAnswers)", color: .green)
+                statCard(title: Constants.incorrectText, value: "\(incorrectAnswers)", color: .red)
             }
 
             if let onContinue = onContinue {
@@ -78,18 +88,18 @@ struct StatisticsView: View {
                     Text(Constants.continueLearningButtonText)
                         .padding()
                         .frame(maxWidth: .infinity)
-                        .background(Constants.buttonColor)
-                        .foregroundColor(Constants.buttonTextColor)
-                        .cornerRadius(12)
+                        .background(uiConfig.buttonBackgroundColor)
+                        .foregroundColor(uiConfig.buttonTextColor)
+                        .cornerRadius(Constants.buttonCornerRadius)
                         .font(.headline)
                 }
-                .padding(.horizontal, 20)
+                .padding(.horizontal, Constants.buttonPadding)
             }
         }
     }
 
     private func statCard(title: String, value: String, color: Color) -> some View {
-        VStack(spacing: 5) {
+        VStack(spacing: Constants.spacingSmall) {
             Text(value)
                 .font(.title2)
                 .foregroundColor(color)
@@ -100,8 +110,15 @@ struct StatisticsView: View {
         }
         .padding()
         .frame(maxWidth: .infinity)
-        .background(RoundedRectangle(cornerRadius: 10).fill(Color.white.opacity(0.8)))
-        .shadow(color: Color.black.opacity(0.1), radius: 5, x: 0, y: 2)
+        .background(
+            RoundedRectangle(cornerRadius: Constants.cardCornerRadius)
+                .fill(Color.white.opacity(Constants.cardBackgroundOpacity))
+        )
+        .shadow(
+            color: Color.black.opacity(Constants.cardShadowOpacity),
+            radius: Constants.cardShadowRadius,
+            x: 0,
+            y: Constants.cardShadowOffsetY
+        )
     }
-
 }

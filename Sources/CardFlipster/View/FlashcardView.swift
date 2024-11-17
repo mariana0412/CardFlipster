@@ -36,11 +36,7 @@ public struct FlashcardView: View {
 
     let frontText: String
     let backText: String
-    let frontColor: Color
-    let backColor: Color
-    let font: Font
-    let frontFontColor: Color
-    let backFontColor: Color
+    let uiConfig: FlashcardUIConfig
     let axis: Axis
     let animationDuration: TimeInterval
 
@@ -56,14 +52,14 @@ public struct FlashcardView: View {
 
     private var cardView: some View {
         ZStack {
-            cardSide(text: frontText, color: frontColor, fontColor: frontFontColor)
+            cardSide(text: frontText, color: uiConfig.frontColor, fontColor: uiConfig.frontFontColor)
                 .opacity(isFlipped ? 0 : 1)
                 .rotation3DEffect(
                     .degrees(isFlipped ? 180 : 0),
                     axis: resolvedAxis
                 )
 
-            cardSide(text: backText, color: backColor, fontColor: backFontColor)
+            cardSide(text: backText, color: uiConfig.backColor, fontColor: uiConfig.backFontColor)
                 .opacity(isFlipped ? 1 : 0)
                 .rotation3DEffect(
                     .degrees(isFlipped ? 0 : -180),
@@ -80,7 +76,7 @@ public struct FlashcardView: View {
             .fill(color)
             .overlay(
                 Text(text)
-                    .font(font)
+                    .font(uiConfig.font)
                     .foregroundColor(fontColor)
                     .padding()
                     .minimumScaleFactor(Constants.minScaleFactor)
@@ -164,32 +160,4 @@ public struct FlashcardView: View {
         cardOpacity = 1.0
     }
 
-}
-
-struct FlashcardViewPreview: View {
-    @State private var isFlipped = false
-
-    var body: some View {
-        FlashcardView(
-            isFlipped: $isFlipped,
-            onSwipeRight: {
-                print("Swiped Right - Correct Answer")
-            },
-            onSwipeLeft: {
-                print("Swiped Left - Incorrect Answer")
-            },
-            frontText: "Hello, World!",
-            backText: "Goodbye, World!",
-            frontColor: .blue,
-            backColor: .yellow,
-            font: .largeTitle,
-            frontFontColor: .white,
-            backFontColor: .black,
-            axis: .horizontal,
-            animationDuration: 0.8
-        )
-    }
-}
-#Preview {
-    FlashcardViewPreview()
 }
