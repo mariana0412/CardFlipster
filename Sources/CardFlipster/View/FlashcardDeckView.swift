@@ -25,10 +25,12 @@ public struct FlashcardDeckView: View {
 
     // MARK: - Init
 
-    /// Creates a flashcard deck view with the given flashcards and theme.
-    /// - Parameters:
-    ///   - flashcards: An array of `Flashcard` objects to be displayed in the deck.
-    ///   - theme: The theme for configuring the appearance of the flashcard deck.
+    /**
+     Creates a flashcard deck view with the given flashcards and theme.
+     - Parameters:
+        - flashcards: An array of `Flashcard` objects to be displayed in the deck.
+        - theme: The theme for configuring the appearance of the flashcard deck.
+     */
     public init(flashcards: [Flashcard], theme: FlashcardDeckTheme = .light) {
         _viewModel = StateObject(wrappedValue: FlashcardDeckViewModel(flashcards: flashcards))
         self.uiConfig = theme.config

@@ -16,11 +16,12 @@ public struct FlashcardDeckUIConfig {
     /// The appearance configuration for the statistics screen.
     public let statisticsConfig: StatisticsScreenUIConfig
 
-    /// Initializes a new configuration object for the flashcard deck.
-    ///
-    /// - Parameters:
-    ///   - flashcardConfig: The appearance configuration for the flashcards.
-    ///   - statisticsConfig: The appearance configuration for the statistics screen.
+    /**
+     Initializes a new configuration object for the flashcard deck.
+     - Parameters:
+       - flashcardConfig: The appearance configuration for the flashcards.
+       - statisticsConfig: The appearance configuration for the statistics screen.
+     */
     public init(
         flashcardConfig: FlashcardUIConfig,
         statisticsConfig: StatisticsScreenUIConfig
