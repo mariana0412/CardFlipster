@@ -19,7 +19,7 @@ to create visually stunning and interactive applications.
 
 - iOS 15.0 or later
 - Xcode 15.0 or later
-- Swift 5.5 or later
+- Swift 5.10 or later
 
 ## Installation
 ### Swift Package Manager (SPM)
